@@ -36,6 +36,25 @@ async function getMealsBySearch(term) {
   return meals;
 }
 
+// Performs Search Meal Operation
+search_icon.addEventListener('click', async () => {
+  mealEl_container.innerHTML = '';
+  const searchVal = search_input.value;
+  const meals = await getMealsBySearch(searchVal);
+
+  if (meals) {
+    meals.forEach((meal) => {
+      addMeal(meal);
+    });
+    document.querySelector('.meals-container > h2').innerText =
+      'Search Results';
+  } else {
+    document.querySelector('.meals-container > h2').innerText =
+      'No Meals Found';
+    mealEl_container.innerHTML = '';
+  }
+});
+
 // Function to Add Meal Searched by User
 function addMeal(meal) {
   const meal_card = document.createElement('div');
@@ -53,6 +72,7 @@ function addMeal(meal) {
 
   const btn = meal_card.querySelector('.fa-heart');
   btn.addEventListener('click', () => {
+    // It is used to check  if the meal added has favourite icon(fa-heart) is clicked or not
     if (btn.classList.contains('fa-regular')) {
       btn.setAttribute('class', 'fa-solid fa-heart');
       addMealLS(meal.idMeal);
@@ -68,10 +88,27 @@ function addMeal(meal) {
   });
 }
 
-// Close the Popup Modal
-close_popup_btn.addEventListener('click', () => {
-  popup_container.style.display = 'none';
-});
+// Fetches the Meal from the Local Storage
+function getMealLS() {
+  const mealIds = JSON.parse(localStorage.getItem('mealIds'));
+
+  return mealIds === null ? [] : mealIds;
+}
+
+// Add Meal to the Local Storage
+function addMealLS(mealID) {
+  const mealIds = getMealLS();
+  localStorage.setItem('mealIds', JSON.stringify([...mealIds, mealID]));
+}
+
+// Remove Meal from Local Storage
+function removeMealLS(mealID) {
+  const mealIds = getMealLS();
+  localStorage.setItem(
+    'mealIds',
+    JSON.stringify(mealIds.filter((id) => id !== mealID))
+  );
+}
 
 // Displays the Meal Details in Modal
 function showMealPopup(meal) {
@@ -130,45 +167,9 @@ function showMealPopup(meal) {
   popup_container.style.display = 'flex';
 }
 
-// Fetches the Meal from the Local Storage
-function getMealLS() {
-  const mealIds = JSON.parse(localStorage.getItem('mealIds'));
-
-  return mealIds === null ? [] : mealIds;
-}
-
-// Add Meal to the Local Storage
-function addMealLS(mealID) {
-  const mealIds = getMealLS();
-  localStorage.setItem('mealIds', JSON.stringify([...mealIds, mealID]));
-}
-
-// Remove Meal from Local Storage
-function removeMealLS(mealID) {
-  const mealIds = getMealLS();
-  localStorage.setItem(
-    'mealIds',
-    JSON.stringify(mealIds.filter((id) => id !== mealID))
-  );
-}
-
-// Performs Search Meal Operation
-search_icon.addEventListener('click', async () => {
-  mealEl_container.innerHTML = '';
-  const searchVal = search_input.value;
-  const meals = await getMealsBySearch(searchVal);
-
-  if (meals) {
-    meals.forEach((meal) => {
-      addMeal(meal);
-    });
-    document.querySelector('.meals-container > h2').innerText =
-      'Search Results';
-  } else {
-    document.querySelector('.meals-container > h2').innerText =
-      'No Meals Found';
-    mealEl_container.innerHTML = '';
-  }
+// Close the Popup Modal
+close_popup_btn.addEventListener('click', () => {
+  popup_container.style.display = 'none';
 });
 
 // Displays the dark and light node for the pop-up
